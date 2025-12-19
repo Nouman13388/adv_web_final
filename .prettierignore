@@ -1,0 +1,10 @@
+# Ignore Django template files
+templates/**/*.html
+
+# Ignore other files that shouldn't be formatted
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+staticfiles/
+venv/

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ resource.title }} - Resource Management{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+  <div class="card-header bg-primary text-white">
+    <h3 class="mb-0">{{ resource.title }}</h3>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <p>
+          <strong>Type:</strong>
+          <span class="badge bg-info">{{ resource.get_resource_type_display }}</span>
+        </p>
+        <p><strong>Created By:</strong> {{ resource.created_by.username }}</p>
+        <p>
+          <strong>Created At:</strong> {{ resource.created_at|date:"F d, Y, g:i a" }}
+        </p>
+      </div>
+      <div class="col-md-6">
+        <p>
+          <strong>File:</strong>
+          {% if resource.uploaded_file %}
+          <a href="{{ resource.uploaded_file.url }}" class="btn btn-sm btn-success" download>Download File</a>
+          {% else %}
+          <span class="text-muted">No file uploaded</span>
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="mb-3">
+      <h5>Description:</h5>
+      <p>{{ resource.description }}</p>
+    </div>
+
+    <div class="mt-4">
+      <a href="{% url 'resource_list' %}" class="btn btn-secondary">Back to List</a>
+      {% if can_edit %}
+      <a href="{% url 'resource_update' resource.pk %}" class="btn btn-warning">Edit</a>
+      {% endif %}
+      {% if can_delete %}
+      <a href="{% url 'resource_delete' resource.pk %}" class="btn btn-danger">Delete</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

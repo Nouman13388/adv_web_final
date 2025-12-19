@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Resources - Resource Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Resources</h2>
+  {% if user_role == 'administrator' or user_role == 'faculty' %}
+  <a href="{% url 'resource_create' %}" class="btn btn-primary">Create New Resource</a>
+  {% endif %}
+</div>
+
+{% if page_obj %}
+<div class="table-responsive">
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Created By</th>
+        <th>Created At</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for resource in page_obj %}
+      <tr>
+        <td>{{ resource.title }}</td>
+        <td>
+          <span class="badge bg-info">{{ resource.get_resource_type_display }}</span>
+        </td>
+        <td>{{ resource.description|truncatewords:10 }}</td>
+        <td>{{ resource.created_by.username }}</td>
+        <td>{{ resource.created_at|date:"M d, Y" }}</td>
+        <td>
+          <a href="{% url 'resource_detail' resource.pk %}" class="btn btn-sm btn-info">View</a>
+          {% if user_role == 'administrator' or user_role == 'faculty' %}
+          <a href="{% url 'resource_update' resource.pk %}" class="btn btn-sm btn-warning">Edit</a>
+          {% endif %}
+          {% if user_role == 'administrator' or user_role == 'faculty' and resource.created_by == user %}
+          <a href="{% url 'resource_delete' resource.pk %}" class="btn btn-sm btn-danger">Delete</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="?page=1" aria-label="First">
+        <span aria-hidden="true">&laquo;&laquo;</span>
+      </a>
+    </li>
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <span class="page-link">&laquo;&laquo;</span>
+    </li>
+    <li class="page-item disabled">
+      <span class="page-link">&laquo;</span>
+    </li>
+    {% endif %}
+    
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+      <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+      </li>
+      {% endif %}
+    {% endfor %}
+    
+    {% if page_obj.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+        <span aria-hidden="true">&raquo;&raquo;</span>
+      </a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <span class="page-link">&raquo;</span>
+    </li>
+    <li class="page-item disabled">
+      <span class="page-link">&raquo;&raquo;</span>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+
+<div class="text-center text-muted">
+  <small>
+    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} ({{ page_obj.paginator.count }} total resources)
+  </small>
+</div>
+{% else %}
+<div class="alert alert-info">No resources available.</div>
+{% endif %}
+
+{% endblock %}
